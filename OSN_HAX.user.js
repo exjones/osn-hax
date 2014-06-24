@@ -19,9 +19,11 @@ function waitAndInstall(){
     el.onload=function(){
       document.body.removeChild(document.getElementById("OSN_HAX.src"));
     };
-    el.src="osn-hax.js";
+    el.src="https://raw.githubusercontent.com/exjones/osn-hax/master/osn-hax.js";
     document.body.appendChild(el);
   }
 }
-waitAndInstall();
+// Don't run on frames or iframes 
+if (window.top != window.self) return;
+else waitAndInstall();
 

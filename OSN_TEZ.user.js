@@ -19,9 +19,11 @@ function waitAndInstall(){
     el.onload=function(){
       document.body.removeChild(document.getElementById("OSN_TEZ.src"));
     };
-    el.src="osn-tez.js";
+    el.src="https://raw.githubusercontent.com/exjones/osn-hax/master/osn-tez.js";
     document.body.appendChild(el);
   }
 }
-waitAndInstall();
+// Don't run on frames or iframes 
+if (window.top != window.self) return;
+else waitAndInstall();
 

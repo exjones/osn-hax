@@ -120,7 +120,7 @@ OLK.prototype.shortenLink = function(){
             // Load the shortened URL as JSON
             $.ajax({ 
                 type: 'GET', 
-                url: 'http://is.gd/create.php', 
+                url: 'https://is.gd/create.php', 
                 dataType: "json",
                 timeout: 10000,
                 data: {
