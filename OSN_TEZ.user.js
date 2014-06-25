@@ -1,12 +1,12 @@
 // ==UserScript==
-// // @name        OSN TEZ
-// // @namespace   com.oracle.osn.tez
-// // @description A script to allow resizing of edit boxes in Oracle Social Network
-// // @include     https://osn-fusioncrm.oracle.com/osn/web/*
-// // @version     0.1
-// // @grant       none
-// // @run-at      document-start
-// // ==/UserScript==
+// @name        OSN TEZ
+// @namespace   com.oracle.osn.tez
+// @description A script to allow resizing of edit boxes in Oracle Social Network
+// @include     https://osn-fusioncrm.oracle.com/osn/web/*
+// @version     0.1
+// @grant       none
+// @run-at      document-start
+// ==/UserScript==
 function waitAndInstall(){
   var userName = document.getElementById("userName");
   if(userName === null){

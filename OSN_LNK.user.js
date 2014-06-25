@@ -1,12 +1,12 @@
 // ==UserScript==
-// // @name        OSN LNK
-// // @namespace   com.oracle.osn.lnk
-// // @description A script to help with creating permalinks in Oracle Social Network
-// // @include     https://osn-fusioncrm.oracle.com/osn/web/*
-// // @version     0.1
-// // @grant       none
-// // @run-at      document-start
-// // ==/UserScript==
+// @name        OSN LNK
+// @namespace   com.oracle.osn.lnk
+// @description A script to help with creating permalinks in Oracle Social Network
+// @include     https://osn-fusioncrm.oracle.com/osn/web/*
+// @version     0.1
+// @grant       none
+// @run-at      document-start
+// ==/UserScript==
 function waitAndInstall(){
   var userName = document.getElementById("userName");
   if(userName === null){

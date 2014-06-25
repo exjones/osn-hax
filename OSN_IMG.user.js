@@ -1,12 +1,12 @@
 // ==UserScript==
-// // @name        OSN IMG
-// // @namespace   com.oracle.osn.img
-// // @description A script to allow easier embedding of images in Oracle Social Network posts
-// // @include     https://osn-fusioncrm.oracle.com/osn/web/*
-// // @version     0.5
-// // @grant       none
-// // @run-at      document-start
-// // ==/UserScript==
+// @name        OSN IMG
+// @namespace   com.oracle.osn.img
+// @description A script to allow easier embedding of images in Oracle Social Network posts
+// @include     https://osn-fusioncrm.oracle.com/osn/web/*
+// @version     0.5
+// @grant       none
+// @run-at      document-start
+// ==/UserScript==
 function waitAndInstall(){
   var userName = document.getElementById("userName");
   if(userName === null){
