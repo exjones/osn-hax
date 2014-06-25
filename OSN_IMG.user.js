@@ -19,7 +19,7 @@ function waitAndInstall(){
     el.onload=function(){
       document.body.removeChild(document.getElementById("OSN_IMG.src"));
     };
-    el.src="https://raw.githubusercontent.com/exjones/osn-hax/master/osn-img.js";
+    el.src="https://osn-hax.herokuapp.com/osn-img.js";
     document.body.appendChild(el);
   }
 }
