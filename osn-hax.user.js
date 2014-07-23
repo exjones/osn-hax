@@ -35,6 +35,8 @@ function waitAndInstall(){
         injectScript:function(src){
             var el=document.createElement('script');
             el.type='text/javascript';
+            
+            if(src.indexOf('http') == -1) src = window.OSNH.BASE_URLS[window.OSNH.config.channel] + src;
             el.src=src;
             document.body.appendChild(el);
         }
@@ -44,7 +46,7 @@ function waitAndInstall(){
     window.OSNH.saveConfig(window.OSNH.config);
 
     window.OSNH.log('Injecting OSN HAX bootstrap code from ' + window.OSNH.BASE_URLS[window.OSNH.config.channel]);
-    window.OSNH.injectScript(window.OSNH.BASE_URLS[window.OSNH.config.channel] + 'osnh-bootstrap.js');
+    window.OSNH.injectScript('osnh-bootstrap.js');
   }
 }
 // Don't run on frames or iframes 
