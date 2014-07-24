@@ -108,36 +108,40 @@ var SLIDE = {
                         }
                     }
                 }
-                SLIDE.show();
+                if(SLIDE.imgs.length !== 0) SLIDE.show();
+                else{
+                    alert('There don\'t seem to be any images in this conversation');
+                }
             }
         });
     },
     
-    start: function(){
+    start: function(evt){
             
+        evt.preventDefault();
+        
         SLIDE.hide();
         
-        SLIDE.convoId = window.location.hash;
-        var st=SLIDE.convoId.indexOf("conversation:id=")+16;
-        var en=SLIDE.convoId.indexOf("&",st);
-
-        SLIDE.convoId=SLIDE.convoId.substring(st,en);
-        
-        window.OSNH.ajax({
-            method:'GET',
-            resource:'conversations/'+SLIDE.convoId,
-            callback:function(e){
-                SLIDE.getDocs(e.folderURL);
-            }
-        })
+        SLIDE.convoId = window.OSNH.getConversationId();
+        if(SLIDE.convoId !== null){
+            window.OSNH.ajax({
+                method:'GET',
+                resource:'conversations/'+SLIDE.convoId,
+                callback:function(e){
+                    SLIDE.getDocs(e.folderURL);
+                }
+            });
+        }
+        else window.OSNH.log('Current location doesn\'t look like a conversation');
+    },
+    
+    register: function(){
+        window.OSNH.addConversationMenuItem('OSNH_slide','Image Slideshow',window.OSNH.slide.start);
+        window.OSNH.registerHashChangeListener('OSNH_slide',window.OSNH.slide.hide);
     }
 };
 
-// Insert item in More menu
-// $('div.GE0BIW3BMS div.GE0BIW3BHS div.GE0BIW3BJS')
-// and not .GE0BIW3BLS
-
 window.OSNH.slide = SLIDE;
-window.OSNH.slide.start();
+window.OSNH.slide.register();
 
 

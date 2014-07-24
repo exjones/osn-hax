@@ -9,12 +9,6 @@ var OSNH = window.OSNH;
 OSNH.log('Bootstrapping OSN HAX from the '+OSNH.config.channel+' channel.');
 
 OSNH.components = {
-    /*
-    "osn-hax":{
-        name:"osn-hax",
-        description:"Unread message navigation.",
-        src:"osn-hax.js"
-    },*/
     "osnh-styling":{
         name:"Styling Tweaks",
         description:"Various styling tweaks to the OSN interface, via injected CSS.",
@@ -24,11 +18,16 @@ OSNH.components = {
         name:"Message Navigation",
         description:"Easier ways to navigate unread messages.",
         src:"osnh-navigation.js"
-    }/*,
+    },
     "osnh-slideshow":{
         name:"Image Slideshow",
         description:"Display a floating slideshow of all the pictures in a conversation. Inspired by the Apple TV screen saver!",
         src:"osnh-slideshow.js"
+    },
+    "osnh-members":{
+        name:"List Members",
+        description:"Shows a list of all the people in a conversation, regardless of which group membership brought them in.",
+        src:"osnh-members.js"
     },
     "osn-img":{
         name:"osn-img",
@@ -44,7 +43,7 @@ OSNH.components = {
         name:"osn-lnk",
         description:"An extension which helps you create permalinks to posts.",
         src:"osn-lnk.js"
-    }*/
+    }
 };
 
 OSNH.injectCSS = function(arr){
@@ -122,6 +121,10 @@ OSNH.install = function(){
     
     OSNH.injectCSS("div#osnbMask{z-index:2;}");
     OSNH.createToolbar();
+    
+    setInterval(OSNH.injectConvoMenu,500);
+    
+    $(window).on('hashchange',OSNH.informHashListeners);
 };
 
 OSNH.apiBase = window.location.pathname.substring(0,window.location.pathname.indexOf('/',1))+'/social/api/v1/';
@@ -147,6 +150,75 @@ OSNH.ajax = function(conf){
         beforeSend:OSNH.beforeSend,
         error:OSNH.ajaxError
     });
+};
+
+OSNH.getConversationId = function(){
+    
+    var id = window.location.hash;
+    var st = id.indexOf('conversation:id=');
+    if(st == -1) return null;
+    
+    st+=16;
+    var en=id.indexOf("&",st);
+    
+    return id.substring(st,en);
+};
+
+OSNH.injectConvoMenu = function(){
+
+    // Not a conversation
+    if(window.location.href.indexOf('conversation:id=') == -1) return;
+
+    // Find the More menu
+    var popup = $('div.GE0BIW3BMS:visible');
+    if(popup.length){
+        
+        // This is the More menu in the header
+        if($(popup).find('.GE0BIW3BGN').length !== 0) return;
+        
+        // Find the items in it that aren't in the system menu
+        var items = $(popup).find('div.GE0BIW3BHS div.GE0BIW3BJS').not('.GE0BIW3BLS');
+        if(items.length){
+            for(var m in OSNH.convoMenu){
+                
+                // If there isn't already a menu item with this ID
+                if($('#'+m).length === 0){
+
+                    OSNH.log("Adding menu item: " + m + '=' + OSNH.convoMenu[m].text);
+                
+                    // Add it and bind its click
+                    $(items[items.length-1]).after(
+                        '<div class="GE0BIW3BJS"><a id="'+m+'" class="gwt-Anchor GE0BIW3BKS" href="#" title="'+OSNH.convoMenu[m].text+'" style="text-overflow: ellipsis; white-space: nowrap;">'+OSNH.convoMenu[m].text+'</a></div>'
+                    );
+                    $('#'+m).click(OSNH.convoMenu[m].callback);
+                }
+            }
+        }
+    }
+};
+
+OSNH.addConversationMenuItem = function(id,text,callback){
+    
+    if(typeof(OSNH.convoMenu) === 'undefined') OSNH.convoMenu = {};
+    
+    OSNH.convoMenu[id] = {
+       text:text,
+       callback:callback
+    };
+};
+
+OSNH.informHashListeners = function(){
+
+    for(var h in OSNH.hashListeners){
+        OSNH.hashListeners[h]();
+    }    
+};
+
+OSNH.registerHashChangeListener = function(id,callback){
+    
+    if(typeof(OSNH.hashListeners) === 'undefined') OSNH.hashListeners = {};
+    
+    OSNH.hashListeners[id] = callback;
 };
 
 OSNH.install();
