@@ -120,7 +120,7 @@ OLK.prototype.shortenLink = function(){
             // Load the shortened URL as JSON
             $.ajax({ 
                 type: 'GET', 
-                url: 'https://is.gd/create.php', 
+                url: 'https://v.gd/create.php', 
                 dataType: "json",
                 timeout: 10000,
                 data: {
@@ -285,8 +285,8 @@ OLK.prototype.setPermalinkValue = function(val){
 };
 
 OLK.prototype.install = function(){
-    if(typeof HAX != 'undefined' && HAX){
-        HAX.addToolbarButton(function(){window.olk.permalinkGenerator();},"Permalink generator","Ctrl+Alt+P",OLK.imgs.link_icon);
+    if(typeof OSNH != 'undefined' && OSNH){
+        OSNH.addToolbarButton(function(){window.olk.permalinkGenerator();},"Permalink generator","Ctrl+Alt+P",OLK.imgs.link_icon);
         
         Mousetrap.bindGlobal('backspace', function() {
             if($("#OLKDLG:visible").length){

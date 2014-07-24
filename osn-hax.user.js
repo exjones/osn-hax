@@ -30,7 +30,12 @@ function waitAndInstall(){
             }
         },
         log:function(msg){
-            if(typeof(console) !== 'undefined' && typeof(console.log) !== 'undefined') console.log(msg);
+            if(typeof(console) !== 'undefined' && console && typeof(console.debug) !== 'undefined'){
+                for(var a = 0;a < arguments.length;a++){
+                    console.debug(arguments[a]);
+                }
+            }
+
         },
         injectScript:function(src){
             var el=document.createElement('script');

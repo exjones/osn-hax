@@ -1,6 +1,6 @@
+/*
 if(typeof Mousetrap != "undefined" && Mousetrap) Mousetrap.reset();
 
-/* mousetrap v1.3.2 craig.is/killing/mice */
 (function(){function s(a,b,c){a.addEventListener?a.addEventListener(b,c,!1):a.attachEvent("on"+b,c)}function y(a){if("keypress"==a.type){var b=String.fromCharCode(a.which);a.shiftKey||(b=b.toLowerCase());return b}return h[a.which]?h[a.which]:z[a.which]?z[a.which]:String.fromCharCode(a.which).toLowerCase()}function t(a,b){a=a||{};var c=!1,d;for(d in m)a[d]&&m[d]>b?c=!0:m[d]=0;c||(p=!1)}function A(a,b,c,d,g){var f,e,h=[],j=c.type;if(!l[a])return[];"keyup"==j&&u(a)&&(b=[a]);for(f=0;f<l[a].length;++f)if(e=
 l[a][f],!(e.seq&&m[e.seq]!=e.level)&&j==e.action&&("keypress"==j&&!c.metaKey&&!c.ctrlKey||b.sort().join(",")===e.modifiers.sort().join(",")))d&&e.combo==g&&l[a].splice(f,1),h.push(e);return h}function v(a,b,c){if(!k.stopCallback(b,b.target||b.srcElement,c)&&!1===a(b,c))b.preventDefault&&b.preventDefault(),b.stopPropagation&&b.stopPropagation(),b.returnValue=!1,b.cancelBubble=!0}function w(a){"number"!==typeof a.which&&(a.which=a.keyCode);var b=y(a);if(b)if("keyup"==a.type&&x==b)x=!1;else{var c=[];
 a.shiftKey&&c.push("shift");a.altKey&&c.push("alt");a.ctrlKey&&c.push("ctrl");a.metaKey&&c.push("meta");var c=A(b,c,a),d,g={},f=0,e=!1;for(d=0;d<c.length;++d)c[d].seq?(e=!0,f=Math.max(f,c[d].level),g[c[d].seq]=1,v(c[d].callback,a,c[d].combo)):!e&&!p&&v(c[d].callback,a,c[d].combo);a.type==p&&!u(b)&&t(g,f)}}function u(a){return"shift"==a||"ctrl"==a||"alt"==a||"meta"==a}function B(a,b,c){if(!c){if(!q){q={};for(var d in h)95<d&&112>d||h.hasOwnProperty(d)&&(q[h[d]]=d)}c=q[a]?"keydown":"keypress"}"keypress"==
@@ -9,8 +9,8 @@ B(e,j,c);l[e]||(l[e]=[]);A(e,j,{type:c},!d,a);l[e][d?"unshift":"push"]({callback
 F={"~":"`","!":"1","@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},E={option:"alt",command:"meta","return":"enter",escape:"esc"},q,l={},r={},m={},D,x=!1,p=!1,g=1;20>g;++g)h[111+g]="f"+g;for(g=0;9>=g;++g)h[g+96]=g;s(document,"keypress",w);s(document,"keydown",w);s(document,"keyup",w);var k={bind:function(a,b,c){a=a instanceof Array?a:[a];for(var d=0;d<a.length;++d)C(a[d],b,c);return this},unbind:function(a,b){return k.bind(a,
 function(){},b)},trigger:function(a,b){if(r[a+":"+b])r[a+":"+b]({},a);return this},reset:function(){l={};r={};return this},stopCallback:function(a,b){return-1<(" "+b.className+" ").indexOf(" mousetrap ")?!1:"INPUT"==b.tagName||"SELECT"==b.tagName||"TEXTAREA"==b.tagName||b.contentEditable&&"true"==b.contentEditable}};window.Mousetrap=k;"function"===typeof define&&define.amd&&define(k)})();
 
-// Global bind Mousetrap extension
 Mousetrap=function(a){var d={},e=a.stopCallback;a.stopCallback=function(b,c,a){return d[a]?!1:e(b,c,a)};a.bindGlobal=function(b,c,e){a.bind(b,c,e);if(b instanceof Array)for(c=0;c<b.length;c++)d[b[c]]=!0;else d[b]=!0};return a}(Mousetrap);
+*/
 
 /* 
 OSN user interface Javascript hacks 
@@ -263,6 +263,7 @@ HAX.nextUnreadByImg = function(){
         HAX.lastImg.parentNode.scrollIntoView(false);        
     }
 };
+/*
 HAX.addToolbarButton = function(func,hint,accel,icon){
     
     var td = document.createElement("td");
@@ -288,11 +289,13 @@ HAX.addToolbarButton = function(func,hint,accel,icon){
         Mousetrap.bind(accel.toLowerCase(),function(){HAX.log("Keyboard shortcut: " + accel);func();});
     }
 };
+*/
 HAX.removeToolbarButton = function(accel){
     Mousetrap.unbind(accel.toLowerCase());
     $('td[data-accelerator="'+accel+'"]').remove();
 };
 HAX.createToolbar = function(){
+    /*
     HAX.destroyToolbar();
     HAX.toolbar = document.createElement("table");
     HAX.toolbar.setAttribute("id","HAX.toolbar");
@@ -321,10 +324,11 @@ HAX.createToolbar = function(){
     }
 
     $(HAX.toolbar).append("<tbody><tr></tr></tbody>");
+    */
 
-    HAX.addToolbarButton(HAX.gotoUnread,"Unread message list","Ctrl+Alt+U",HAX.imgs.folder_page);
-    HAX.addToolbarButton(HAX.nextUnread,"Next unread message","Ctrl+Alt+N",HAX.imgs.email_go);
-    HAX.addToolbarButton(HAX.markAndNext,"Mark read and next","Ctrl+Alt+M",HAX.imgs.email_open);
+    window.OSNH.addToolbarButton(HAX.gotoUnread,"Unread message list","Ctrl+Alt+U",HAX.imgs.folder_page);
+    window.OSNH.addToolbarButton(HAX.nextUnread,"Next unread message","Ctrl+Alt+N",HAX.imgs.email_go);
+    window.OSNH.addToolbarButton(HAX.markAndNext,"Mark read and next","Ctrl+Alt+M",HAX.imgs.email_open);
     // HAX.addToolbarButton(HAX.pasteImage,"Paste image from clipboard","Ctrl+Alt+P",HAX.imgs.paste_image);
     // HAX.addToolbarButton(HAX.initRetroMode,"Retro mode","Ctrl+Alt+R",HAX.imgs.console_mode);
 };
@@ -379,6 +383,8 @@ HAX.initRetroMode = function(){
         document.body.appendChild(scan);
     }
 };
+
+/*
 HAX.destroyToolbar = function(){
     if(typeof HAX.toolbar != "undefined" && HAX.toolbar){
         Mousetrap.reset();
@@ -386,18 +392,10 @@ HAX.destroyToolbar = function(){
         HAX.toolbar = null;
     }
 };
-HAX.styling_hacks = 
-    "div.GE0BIW3BBVC.GE0BIW3BGO > div.gwt-HTML {max-height:100px;overflow:auto;}" +
-    "div.GE0BIW3BFYC.GE0BIW3BIIC > div:first-child {height:auto !important;}" +
-    "div.GE0BIW3BFYC.GE0BIW3BBEC > div:first-child {height:auto !important;}" +
-    "div.GE0BIW3BEBC.GE0BIW3BC2B {position: fixed;top: 65px;right: 253px;background-color: white;overflow:auto;height:auto;bottom:10px;z-index:0;border-left:none !important;} " +
-    "@media (max-width:1245px) {div.GE0BIW3BEBC.GE0BIW3BC2B {right:5px;}}" +
-    "div.GE0BIW3BP1B {background-color:white;z-index:1;border-right:1px solid #C5DBE7;}"+
-    "td.hax-toolbar-button{padding:5px;padding-bottom:0;vertical-align:top;}"+
-    "td.hax-toolbar-button:hover{background-color:#015aa5;}"+
-    "div#osnbMask{z-index:2;}"
+*/
 
 HAX.start = function(){
+    
     var head = document.getElementById("osn-header");
     if(head === null){
         HAX.log("Waiting for OSN interface to initialise...");
@@ -406,15 +404,6 @@ HAX.start = function(){
     else{
         HAX.log("Starting OSN hacks...");
         HAX.createToolbar();
-        
-        // Styling hacks
-        $("#styling_hacks").remove();
-        
-        var css = document.createElement('style');
-        css.setAttribute('type','text/css');
-        css.setAttribute('id','styling_hacks');
-        css.innerHTML = HAX.styling_hacks;
-        document.head.appendChild(css);
     }
 };
 HAX.stop = function(){
