@@ -54,6 +54,9 @@ var MEMB = {
                 }
             });
         }
+        else{
+            $("#loading-indicator").remove();
+        }
     },
     
     getConvoMembers: function(){

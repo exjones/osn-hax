@@ -8,6 +8,8 @@ var OSNH = window.OSNH;
 
 OSNH.log('Bootstrapping OSN HAX from the '+OSNH.config.channel+' channel.');
 
+OSNH.VERSION = '1.0.0';
+
 OSNH.components = {
     "osnh-styling":{
         name:"Styling Tweaks",
@@ -29,6 +31,11 @@ OSNH.components = {
         description:"Shows a list of all the people in a conversation, regardless of which group membership brought them in.",
         src:"osnh-members.js"
     },
+    "osnh-link":{
+        name:"Permalink Generator",
+        description:"An extension which helps you create permalinks to posts.",
+        src:"osnh-link.js"
+    },
     "osn-img":{
         name:"osn-img",
         description:"An extension to OSN to allow easier image uploads and inserts into posts.",
@@ -38,11 +45,6 @@ OSNH.components = {
         name:"osn-tez",
         description:"A Text Editor resiZer hack.",
         src:"osn-tez.js"
-    },
-    "osn-lnk":{
-        name:"osn-lnk",
-        description:"An extension which helps you create permalinks to posts.",
-        src:"osn-lnk.js"
     }
 };
 
@@ -105,6 +107,10 @@ OSNH.addToolbarButton = function(func,hint,accel,icon){
 
 OSNH.install = function(){
     
+    OSNH.injectCSS("div#osnbMask{z-index:2;}");
+    OSNH.createToolbar();
+    OSNH.updateSettingsPage();
+    
     if(OSNH.config.components === null){
         OSNH.log('No specific components enabled, loading everything.');
         for(var c in OSNH.components){
@@ -113,14 +119,11 @@ OSNH.install = function(){
         }
     } 
     else{
-        for(var i = 0;i < OSNH.config.length;i++){
-            OSNH.log('Installing component ' + OSNH.components[OSNH.config[i]].name);
-            OSNH.injectScript(OSNH.components[OSNH.config[i]].src);
+        for(var i = 0;i < OSNH.config.components.length;i++){
+            OSNH.log('Installing component ' + OSNH.components[OSNH.config.components[i]].name);
+            OSNH.injectScript(OSNH.components[OSNH.config.components[i]].src);
         }
     }
-    
-    OSNH.injectCSS("div#osnbMask{z-index:2;}");
-    OSNH.createToolbar();
     
     setInterval(OSNH.injectConvoMenu,500);
     
@@ -209,6 +212,10 @@ OSNH.addConversationMenuItem = function(id,text,callback){
 
 OSNH.informHashListeners = function(){
 
+    // Inject, or update our settings page
+    OSNH.updateSettingsPage();
+    
+    // Tell all the other listeners
     for(var h in OSNH.hashListeners){
         OSNH.hashListeners[h]();
     }    
@@ -220,6 +227,77 @@ OSNH.registerHashChangeListener = function(id,callback){
     
     OSNH.hashListeners[id] = callback;
 };
+
+OSNH.updateSettingsPage = function(){
+    
+    if(window.location.hash !== null && window.location.hash.indexOf('#settings') != -1){
+        OSNH.log('Updating settings page');
+        if($('#osnh-settings-menu').length === 0){
+            var items = $('div.GE0BIW3BEBC.GE0BIW3BO1B > ul:visible').not('.sidebar').find('li');
+            $(items[items.length-1]).before('<li id="osnh-settings-menu" class="textNavItem"><a class="gwt-Anchor" href="#" title="Extensions">Extensions</a></li>');
+        }
+        
+        $('#osnh-settings-menu').click(function(e){
+            
+            $('div.GE0BIW3BEBC.GE0BIW3BO1B > ul:visible').not('.sidebar').find('li').removeClass('selected');
+            $('#osnh-settings-menu').addClass('selected');
+
+            var extensionHtml = '<div class="GE0BIW3BLGC"><div class="gwt-Label">Enable these extensions:</div></div>';
+            
+            for(var c in OSNH.components){
+                var isChecked = '';
+                
+                if(OSNH.config.components === null){
+                    isChecked = 'checked=""';
+                }
+                else{
+                    for(var i = 0;i < OSNH.config.components.length;i++){
+                        if(c == OSNH.config.components[i]){
+                            isChecked = 'checked=""';
+                            break;
+                        } 
+                    }
+                }
+                
+                extensionHtml += '<div class="GE0BIW3BEGC"><span class="gwt-CheckBox GE0BIW3BOFC"><input class="osnh-component" type="checkbox" value="'+c+'" id="'+c+'" tabindex="0" '+isChecked+'><label for="'+c+'">'+OSNH.components[c].name +' - '+OSNH.components[c].description+'</label></span></div>';
+            }
+            
+            $('div.GE0BIW3BL1B > div').html(
+                '<div class="GE0BIW3BHGC"><h1>Extensions: v'+OSNH.VERSION+'</h1></div>'+
+                '<div class="gwt-HTML GE0BIW3BKGC"></div>'+
+                '<div class="gwt-HTML GE0BIW3BFGC">You can change the channel from which you get your extensions. Unless you know what you\'re doing, set this to Release:</div>'+
+                '<div class="GE0BIW3BIGC"><div class="gwt-HTML">Channel</div><select id="osnh-channel-select" class="gwt-ListBox GE0BIW3BGGC">'+
+                '<option value="release"'+((OSNH.config.channel=='release')?' selected=""':'')+'>Release</option>'+
+                '<option value="testing"'+((OSNH.config.channel=='testing')?' selected=""':'')+'>Testing</option>'+
+                '<option value="development"'+((OSNH.config.channel=='development')?' selected=""':'')+'>Development</option>'+
+                '</select>'+
+                '</div>'+
+                extensionHtml +
+                '<div class="gwt-HTML GE0BIW3BKGC"></div>'+
+                '<div class="gwt-HTML GE0BIW3BFGC">Refresh your browser to have any changes take effect.</div>'
+            );
+            
+            $('.osnh-component').change(function(){
+                OSNH.log('Changed checkbox:'+$(this).attr('id')+'='+$(this).is(':checked')); 
+                OSNH.config.components = [];
+                $('.osnh-component').each(function(i,e){
+                    if($(e).is(':checked')) OSNH.config.components.push($(e).attr('id'));    
+                });
+                OSNH.saveConfig(OSNH.config);
+            });
+            
+            $('#osnh-channel-select').change(function(){
+                OSNH.log('Changed channel:'+$(this).val()); 
+                OSNH.config.channel = $(this).val();
+                OSNH.saveConfig(OSNH.config);
+            });
+            
+            e.preventDefault(); 
+        });
+        
+        $('#osnh-settings-menu').removeClass('selected');
+    }
+}
 
 OSNH.install();
 

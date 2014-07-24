@@ -7,6 +7,13 @@
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
+/*
+ * --------------------------------------------
+ * Monochrome icons courtesy of gentleface;
+ * http://www.gentleface.com/free_icon_set.html
+ * --------------------------------------------
+ *
+ */
 function waitAndInstall(){
   var userName = document.getElementById('userName');
   if(userName === null){
@@ -38,6 +45,7 @@ function waitAndInstall(){
 
         },
         injectScript:function(src){
+            
             var el=document.createElement('script');
             el.type='text/javascript';
             
