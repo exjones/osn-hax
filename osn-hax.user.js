@@ -17,7 +17,7 @@ function waitAndInstall(){
         BASE_URLS: {
             'release':'https://stbeehive.oracle.com/content/dav/st/osn-hax/release/',
             'testing':'https://osn-hax.herokuapp.com/',
-            'development':'https://c9.io/exjones/osn-hax/workspace/'
+            'development':'https://osn-hax-c9-exjones.c9.io/'
         },
         loadConfig:function(){
             var config = (typeof(window.localStorage) !== 'undefined') ? window.localStorage['OSNHAX_config'] : null;
