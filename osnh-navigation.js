@@ -130,9 +130,9 @@ var NAV = {
 
     start: function(){
 
-        window.OSNH.addToolbarButton(NAV.gotoUnread,"Unread message list","Ctrl+Alt+U",NAV.imgs.folder_page);
-        window.OSNH.addToolbarButton(NAV.nextUnread,"Next unread message","Ctrl+Alt+N",NAV.imgs.email_go);
-        window.OSNH.addToolbarButton(NAV.markAndNext,"Mark read and next","Ctrl+Alt+M",NAV.imgs.email_open);
+        window.OSNH.addToolbarButton(NAV.gotoUnread,"Unread message list","Ctrl+Alt+U",NAV.imgs.folder_page,1001);
+        window.OSNH.addToolbarButton(NAV.nextUnread,"Next unread message","Ctrl+Alt+N",NAV.imgs.email_go,1002);
+        window.OSNH.addToolbarButton(NAV.markAndNext,"Mark read and next","Ctrl+Alt+M",NAV.imgs.email_open,1003);
     }
 };
 window.OSNH.nav = NAV;

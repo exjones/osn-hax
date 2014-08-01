@@ -281,7 +281,7 @@ OLK.prototype.setPermalinkValue = function(val){
 
 OLK.prototype.install = function(){
     if(typeof OSNH != 'undefined' && OSNH){
-        OSNH.addToolbarButton(function(){window.olk.permalinkGenerator();},"Permalink generator","Ctrl+Alt+P",OLK.imgs.link_icon);
+        OSNH.addToolbarButton(function(){window.olk.permalinkGenerator();},"Permalink generator","Ctrl+Alt+P",OLK.imgs.link_icon,2001);
         
         Mousetrap.bindGlobal('backspace', function() {
             if($("#OLKDLG:visible").length){

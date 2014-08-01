@@ -45,6 +45,11 @@ OSNH.components = {
         name:"osn-tez",
         description:"A Text Editor resiZer hack.",
         src:"osn-tez.js"
+    },
+    "osn-tray":{
+        name:"In Tray",
+        description:"An in-tray for easier navigation of unread and flagged messages.",
+        src:"osnh-tray.js"
     }
 };
 
@@ -53,6 +58,15 @@ OSNH.injectCSS = function(arr){
     css.setAttribute('type','text/css');
     css.innerHTML = (arr instanceof Array) ? arr.join('\n') : arr;
     document.head.appendChild(css);
+};
+
+OSNH.injectHTML = function(arr){
+
+    if($('#osnh-html-injection-point').length <= 0){
+        $('body').append('<div id="osnh-html-injection-point"></div>');
+    }
+
+    $('#osnh-html-injection-point').append((arr instanceof Array) ? arr.join('\n') : arr);
 };
 
 OSNH.createToolbar = function(){
@@ -79,10 +93,14 @@ OSNH.createToolbar = function(){
     $(OSNH.toolbar).append("<tbody><tr></tr></tbody>");
 };
 
-OSNH.addToolbarButton = function(func,hint,accel,icon){
+OSNH.addToolbarButton = function(func,hint,accel,icon,ext_id){
     
     var td = document.createElement("td");
     td.setAttribute("class","osnh-toolbar-button");
+    
+    if(typeof(ext_id) !== undefined){
+        td.setAttribute('data-ext-id',ext_id);
+    }
     
     var a = document.createElement("a");
     a.onclick = function(){func();return false;};
@@ -95,14 +113,26 @@ OSNH.addToolbarButton = function(func,hint,accel,icon){
     img.src = icon;
     
     a.appendChild(img);
-    
-    OSNH.toolbar.getElementsByTagName("tr")[0].appendChild(td);
-    
+
     if(accel !== null){
         td.setAttribute("data-accelerator",accel);
         a.title = hint + " ("+accel+")";
         Mousetrap.bind(accel.toLowerCase(),function(){OSNH.log("Keyboard shortcut: " + accel);func();});
     }
+    
+    var els = $(OSNH.toolbar).find('td.osnh-toolbar-button');
+    for(var e = 0;e < els.length - 1;e++){
+        var ax = $(els[e]).attr('data-ext-id');
+        var nx = $(els[e + 1]).attr('data-ext-id');
+        if(ax < ext_id && nx > ext_id){
+            $(els[e]).after(td);
+            td = null;
+            break;
+        }
+    }
+    if(td !== null){
+        OSNH.toolbar.getElementsByTagName("tr")[0].appendChild(td);
+    } 
 };
 
 OSNH.install = function(){
@@ -182,16 +212,23 @@ OSNH.injectConvoMenu = function(){
         // Find the items in it that aren't in the system menu
         var items = $(popup).find('div.GE0BIW3BHS div.GE0BIW3BJS').not('.GE0BIW3BLS');
         if(items.length){
-            for(var m in OSNH.convoMenu){
+            
+            OSNH.convoMenu.sort(function(a,b){
+                if(a.id < b.id) return -1;
+                if(a.id > b.id) return 1;
+                return 0;
+            });
+            
+            for(var m = 0;m < OSNH.convoMenu.length;m++){
                 
                 // If there isn't already a menu item with this ID
-                if($('#'+m).length === 0){
+                if($('#'+OSNH.convoMenu[m].id).length === 0){
 
-                    OSNH.log("Adding menu item: " + m + '=' + OSNH.convoMenu[m].text);
+                    OSNH.log("Adding menu item: " + OSNH.convoMenu[m].id + '=' + OSNH.convoMenu[m].text);
                 
                     // Add it and bind its click
                     $(items[items.length-1]).after(
-                        '<div class="GE0BIW3BJS"><a id="'+m+'" class="gwt-Anchor GE0BIW3BKS" href="#" title="'+OSNH.convoMenu[m].text+'" style="text-overflow: ellipsis; white-space: nowrap;">'+OSNH.convoMenu[m].text+'</a></div>'
+                        '<div class="GE0BIW3BJS"><a id="'+OSNH.convoMenu[m].id+'" class="gwt-Anchor GE0BIW3BKS" href="#" title="'+OSNH.convoMenu[m].text+'" style="text-overflow: ellipsis; white-space: nowrap;">'+OSNH.convoMenu[m].text+'</a></div>'
                     );
                     $('#'+m).click(OSNH.convoMenu[m].callback);
                 }
@@ -202,12 +239,13 @@ OSNH.injectConvoMenu = function(){
 
 OSNH.addConversationMenuItem = function(id,text,callback){
     
-    if(typeof(OSNH.convoMenu) === 'undefined') OSNH.convoMenu = {};
+    if(typeof(OSNH.convoMenu) === 'undefined') OSNH.convoMenu = [];
     
-    OSNH.convoMenu[id] = {
+    OSNH.convoMenu.push({
+        id:id,
        text:text,
        callback:callback
-    };
+    });
 };
 
 OSNH.informHashListeners = function(){
@@ -284,6 +322,7 @@ OSNH.updateSettingsPage = function(){
                     if($(e).is(':checked')) OSNH.config.components.push($(e).attr('id'));    
                 });
                 OSNH.saveConfig(OSNH.config);
+                OSNH.log('Config='+JSON.stringify(OSNH.config));
             });
             
             $('#osnh-channel-select').change(function(){
