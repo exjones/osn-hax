@@ -29,7 +29,10 @@ http.createServer(function (req, res) {
            var mime = {
                 ".html":"text/html",
                 ".js":"text/javascript",
-                ".css":"text/css"
+                ".css":"text/css",
+                ".png":"image/png",
+                ".jpg":"image/jpeg",
+                ".jpeg":"image/jpeg"
            },
            ext = filename.substring(filename.lastIndexOf("."));
            

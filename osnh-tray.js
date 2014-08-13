@@ -17,7 +17,9 @@ var TRAY = {
     
     expanded: false,
     groupCache: {},
-    
+    lastOpenedTotal: -1,
+    lastTotal: -1, 
+                
     start:function(){
         
         window.OSNH.log('Starting Tray extension');
@@ -48,7 +50,7 @@ var TRAY = {
         $('#osnh-tray-tab').mouseenter(TRAY.showSidebar);
         $('#osnh-tray-panel').mouseleave(TRAY.hideSidebar);
         
-        TRAY.cacheGroups(0);
+        TRAY.getUnreadMessages(0);
     },
     
     hideSidebar:function(){
@@ -70,11 +72,15 @@ var TRAY = {
             $('#osnh-tray-panel').animate({
                 left:"0px"
             },200,'swing');
+            
+            TRAY.lastOpenedTotal = TRAY.lastTotal;
+            
+            TRAY.adjustTitle($('#osnh-tray-total').html().replace('*',''));
         }
     },
     
-    cacheGroups: function(offs){
-
+    getUnreadMessages: function(offs){
+    
         if(offs === 0) {
             if(TRAY.getting) {
                 window.OSNH.log('In the middle of getting unread messages. Aborting new attempt.');
@@ -84,32 +90,6 @@ var TRAY = {
             $('#osnh-tray-busy').show();
             TRAY.getting = true;
         }
-
-        TRAY.getUnreadMessages(0);
-
-        /*
-        window.OSNH.ajax({
-            method:'GET',
-            resource:'groups?offset='+offs+'&count=100',
-            callback:function(obj){
-                
-                for(var c = 0;c < obj.items.length;c++){
-                    TRAY.groupCache[obj.items[c].conversationURL] = obj.items[c].wallURL;
-                }
-                
-                if(obj.hasMore){
-                    TRAY.cacheGroups(offs + obj.items.length);
-                }
-                else{
-                    TRAY.getUnreadMessages(0);
-                }
-            }
-        });
-        */
-    },
-    
-    getUnreadMessages: function(offs){
-        
         
         var filter = {
             excludeClosed:true,
@@ -129,8 +109,10 @@ var TRAY = {
             resource:'conversations?offset='+offs+'&count=100&filter='+encodeURIComponent(JSON.stringify(filter)),
             callback:function(obj){
                 
-                for(var c = 0;c < obj.items.length;c++){
-                    TRAY.unreadList.push(obj.items[c]);
+                if(typeof(obj.items) !== 'undefined'){
+                    for(var c = 0;c < obj.items.length;c++){
+                        TRAY.unreadList.push(obj.items[c]);
+                    }
                 }
                 
                 if(obj.hasMore){
@@ -162,10 +144,12 @@ var TRAY = {
             resource:'followups?offset='+offs+'&count=100&filter='+encodeURIComponent(JSON.stringify(filter)),
             callback:function(obj){
 
-                for(var c = 0;c < obj.items.length;c++){
-                    TRAY.unreadList.push(obj.items[c]);
+                if(typeof(obj.items) != 'undefined'){
+                    for(var c = 0;c < obj.items.length;c++){
+                        TRAY.unreadList.push(obj.items[c]);
+                    }
                 }
-
+                
                 if(obj.hasMore){
                     TRAY.getFlags(offs + obj.items.length);
                 }
@@ -192,10 +176,12 @@ var TRAY = {
             resource:'collections?offset='+offs+'&count=100&filter='+encodeURIComponent(JSON.stringify(filter)),
             callback:function(obj){
 
-                for(var c = 0;c < obj.items.length;c++){
-                    TRAY.unreadList.push(obj.items[c]);
+                if(typeof(obj.items) != 'undefined'){
+                    for(var c = 0;c < obj.items.length;c++){
+                        TRAY.unreadList.push(obj.items[c]);
+                    }
                 }
-
+                
                 if(obj.hasMore){
                     TRAY.getUnreadCollections(offs + obj.items.length);
                 }
@@ -272,15 +258,21 @@ var TRAY = {
                     setTimeout(TRAY.postProcessUnreadDisplay,1);
                 }
                 else if(TRAY.unreadList[m].objectType == 'waggle/wall-group'){
-                    TRAY.unreadList[m].postProcessed = true;
+                    
+                    window.OSNH.ajax({
+                        method:'GET',
+                        resource:TRAY.unreadList[m].membersURL+'?offset=0&count=1',
+                        callback:function(obj){
+                            var it = TRAY.unreadList[m];
                             
-                    //        https://osn-fusioncrm.oracle.com/osn/web/#conversation:id=35853010&m=NOT_SET
+                            TRAY.unreadList[m].postProcessed = true;
                             
-                    // TRAY.unreadList[m].hashValue = 'group:groupId='+TRAY.idFromEnd(TRAY.unreadList[m].url)+'&m=WALL';
-                    TRAY.unreadList[m].hashValue = 'conversation:id='+TRAY.idFromEnd(TRAY.unreadList[m].url)+'&m=NOT_SET';
-                    TRAY.unreadList[m].itemType = 'group';
+                            TRAY.unreadList[m].hashValue = 'group:groupId='+obj.items[0].id+'&m=WALL';
+                            TRAY.unreadList[m].itemType = 'group';
                             
-                    setTimeout(TRAY.postProcessUnreadDisplay,1);
+                            TRAY.postProcessUnreadDisplay();
+                        }
+                    });
                 }
                 else{
                     TRAY.unreadList[m].postProcessed = true;
@@ -304,11 +296,6 @@ var TRAY = {
                 else if(a.modifiedDate > b.modifiedDate) return 1;
                 else return 0;
             });
-            
-            var title = window.document.title;
-            if(title.indexOf(']') != -1){
-                title = title.substring(title.indexOf(']')+2);
-            }
             
             if(TRAY.unreadList.length === 0){
                 $('#osnh-tray-total').hide();
@@ -340,19 +327,30 @@ var TRAY = {
                     $('#osnh-tray-content').append('<div class="osnh-tray-item osnh-type-'+it.itemType+'">'+badge+'<a href="#'+it.hashValue+'">'+it.name+'</a></div>'); 
                 }
                 
+                TRAY.lastTotal = total;
                 if(unsure) total = ''+total+'?';
-                
-                $('#osnh-tray-total').html(total);
-                $('#osnh-tray-total').show();
-                
-                title = '[' + total + '] ' + title;
+                // if(total > TRAY.lastOpenedTotal) total = '*'+total;
+            
+                TRAY.adjustTitle(total);    
             }
             
-            window.document.title = title;
-            
             setTimeout(function(){
-                TRAY.cacheGroups(0);
+                TRAY.getUnreadMessages(0);
             },10000);
+    },
+    
+    adjustTitle: function(msg){
+            
+        var title = window.document.title;
+        if(title.indexOf(']') != -1){
+            title = title.substring(title.indexOf(']')+2);
+        }
+            
+        $('#osnh-tray-total').html(msg);
+        $('#osnh-tray-total').show();
+                
+        title = '[' + msg + '] ' + title;
+        window.document.title = title;
     }
 };
 
