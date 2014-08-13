@@ -230,7 +230,7 @@ OSNH.injectConvoMenu = function(){
                     $(items[items.length-1]).after(
                         '<div class="GE0BIW3BJS"><a id="'+OSNH.convoMenu[m].id+'" class="gwt-Anchor GE0BIW3BKS" href="#" title="'+OSNH.convoMenu[m].text+'" style="text-overflow: ellipsis; white-space: nowrap;">'+OSNH.convoMenu[m].text+'</a></div>'
                     );
-                    $('#'+m).click(OSNH.convoMenu[m].callback);
+                    $('#'+OSNH.convoMenu[m].id).click(OSNH.convoMenu[m].callback);
                 }
             }
         }
