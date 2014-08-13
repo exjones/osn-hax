@@ -28,7 +28,7 @@ function waitAndInstall(){
         },
         loadConfig:function(){
             var config = (typeof(window.localStorage) !== 'undefined') ? window.localStorage['OSNHAX_config'] : null;
-            if(typeof(config) === 'undefined' || config === null || config === '') config = '{"channel":"release","components":null}';
+            if(typeof(config) === 'undefined' || config === null || config === '' || config == 'null') config = '{"channel":"release","components":null}';
             return JSON.parse(config);
         },
         saveConfig:function(obj){
