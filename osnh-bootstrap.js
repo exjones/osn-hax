@@ -312,7 +312,8 @@ OSNH.updateSettingsPage = function(){
                 '</div>'+
                 extensionHtml +
                 '<div class="gwt-HTML GE0BIW3BKGC"></div>'+
-                '<div class="gwt-HTML GE0BIW3BFGC">Refresh your browser to have any changes take effect.</div>'
+                // '<div class="gwt-HTML GE0BIW3BFGC">Refresh your browser to have any changes take effect.</div>'+
+                '<div class="gwt-HTML GE0BIW3BFGC"><a id="osnh_apply_changes" class="gwt-Anchor osn_button_primary osn_button_textOnly" href="#" title="Apply Changes">Apply Changes</a></div>'
             );
             
             $('.osnh-component').change(function(){
@@ -321,14 +322,17 @@ OSNH.updateSettingsPage = function(){
                 $('.osnh-component').each(function(i,e){
                     if($(e).is(':checked')) OSNH.config.components.push($(e).attr('id'));    
                 });
-                OSNH.saveConfig(OSNH.config);
-                OSNH.log('Config='+JSON.stringify(OSNH.config));
             });
             
             $('#osnh-channel-select').change(function(){
                 OSNH.log('Changed channel:'+$(this).val()); 
                 OSNH.config.channel = $(this).val();
+            });
+            
+            $('#osnh_apply_changes').click(function(evt){
+                evt.preventDefault();
                 OSNH.saveConfig(OSNH.config);
+                window.location.reload();
             });
             
             e.preventDefault(); 
