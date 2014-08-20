@@ -336,8 +336,9 @@ OSNH.updateSettingsPage = function(){
             });
             
             $('#osnh_apply_changes').click(function(evt){
+                OSNH.log('Saving config: ' + JSON.stringify(OSNH.config));
                 OSNH.saveConfig(OSNH.config);
-                window.location.reload();
+                setTimeout(function(){OSNH.log('Reloading location: '+window.location);window.location.reload();},1000);
                 evt.preventDefault();
             });
             
