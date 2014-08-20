@@ -137,6 +137,12 @@ OSNH.addToolbarButton = function(func,hint,accel,icon,ext_id){
 
 OSNH.install = function(){
     
+    /*
+    Hijack this plugin ;-) to hide the LastPass overlay, which appears when it can't 
+    connect to the server from inside the firewall. And which can't be closed in Chrome.
+    */
+    $('iframe[id^="lpiframe"]').hide();
+    
     OSNH.injectCSS("div#osnbMask{z-index:2;}");
     OSNH.createToolbar();
     OSNH.updateSettingsPage();
@@ -330,9 +336,9 @@ OSNH.updateSettingsPage = function(){
             });
             
             $('#osnh_apply_changes').click(function(evt){
-                evt.preventDefault();
                 OSNH.saveConfig(OSNH.config);
                 window.location.reload();
+                evt.preventDefault();
             });
             
             e.preventDefault(); 

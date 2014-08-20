@@ -25,7 +25,7 @@ var TRAY = {
         window.OSNH.log('Starting Tray extension');
         
         window.OSNH.injectCSS([
-            '#osnh-tray-tab{margin-left:-1px;position:fixed;left:0;top:10px;width:24px;height:44px;border:1px solid gainsboro;z-index:100;',
+            '#osnh-tray-tab{margin-left:-1px;position:fixed;left:0;top:28px;width:24px;height:44px;border:1px solid gainsboro;z-index:100;',
             'background:url('+TRAY.imgs.mailbox+') white 50% 4px no-repeat;border-left:none;}',
             '#osnh-tray-panel{overflow:auto;-moz-box-sizing: border-box; -webkit-box-sizing: border-box;box-sizing:border-box;padding:5px;position:fixed;left:-200px;top:0;width:200px;height:100%;border-right:1px solid gainsboro;z-index:99;background-color:white;}',
             '.osnh-tray-item{overflow:hidden;padding-left:20px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid gainsboro;}',
@@ -129,7 +129,7 @@ var TRAY = {
     getFlags: function(offs){
         
         var filter = {
-            excludeSelfAssigned:true,
+            excludeSelfAssigned:false,
             includeAssignee:true,
             includeAssigner:false,
             includeClosed:false,
@@ -229,7 +229,7 @@ var TRAY = {
                 }   
                 else if(TRAY.unreadList[m].objectType == 'waggle/wall'){
                     TRAY.unreadList[m].postProcessed = true;
-                    TRAY.unreadList[m].name = 'Wall of ' + TRAY.unreadList[m].name;
+                    TRAY.unreadList[m].name = TRAY.unreadList[m].name + "'s Wall";
                             
                     TRAY.unreadList[m].hashValue = 'user:userId='+TRAY.idFromEnd(TRAY.unreadList[m].modifiedByURL)+'&m=WALL';
                     TRAY.unreadList[m].itemType = 'person';
@@ -300,7 +300,7 @@ var TRAY = {
             
             if(TRAY.unreadList.length === 0){
                 // $('#osnh-tray-total').hide();
-                $('#osnh-tray-content').append('<div class="osnh-tray-item">No unread messages</div>');
+                $('#osnh-tray-content').append('<div class="osnh-tray-item">Your in tray is empty.</div>');
                 TRAY.adjustTitle(0);    
             }
             else{
@@ -320,7 +320,7 @@ var TRAY = {
                         }
                         else{
                             badge='<div class="osnh-tray-badge">'+it.nUnread+'</div>';
-                            total += it.nUnread;    
+                            total++;//= it.nUnread;    
                         }
                         
                     }
