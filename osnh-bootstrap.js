@@ -155,9 +155,14 @@ OSNH.install = function(){
         }
     } 
     else{
+        var loaded = {};
         for(var i = 0;i < OSNH.config.components.length;i++){
-            OSNH.log('Installing component ' + OSNH.components[OSNH.config.components[i]].name);
-            OSNH.injectScript(OSNH.components[OSNH.config.components[i]].src);
+            var cmp = OSNH.config.components[i];
+            if(!loaded[cmp]){
+                loaded[cmp] = true;
+                OSNH.log('Installing component ' + OSNH.components[cmp].name);
+                OSNH.injectScript(OSNH.components[cmp].src);
+            }
         }
     }
     
@@ -311,9 +316,9 @@ OSNH.updateSettingsPage = function(){
                 '<div class="gwt-HTML GE0BIW3BKGC"></div>'+
                 '<div class="gwt-HTML GE0BIW3BFGC">You can change the channel from which you get your extensions. Unless you know what you\'re doing, set this to Release:</div>'+
                 '<div class="GE0BIW3BIGC"><div class="gwt-HTML">Channel</div><select id="osnh-channel-select" class="gwt-ListBox GE0BIW3BGGC">'+
-                '<option value="release"'+((OSNH.config.channel=='release')?' selected=""':'')+'>Release</option>'+
-                '<option value="testing"'+((OSNH.config.channel=='testing')?' selected=""':'')+'>Testing</option>'+
-                '<option value="development"'+((OSNH.config.channel=='development')?' selected=""':'')+'>Development</option>'+
+                '<option value="release"'+((OSNH.config.channel=='release')?' selected="selected"':'')+'>Release</option>'+
+                '<option value="testing"'+((OSNH.config.channel=='testing')?' selected="selected"':'')+'>Testing</option>'+
+                '<option value="development"'+((OSNH.config.channel=='development')?' selected="selected"':'')+'>Development</option>'+
                 '</select>'+
                 '</div>'+
                 extensionHtml +
@@ -324,10 +329,17 @@ OSNH.updateSettingsPage = function(){
             
             $('.osnh-component').change(function(){
                 OSNH.log('Changed checkbox:'+$(this).attr('id')+'='+$(this).is(':checked')); 
-                OSNH.config.components = [];
+                
+                var arr = {};
                 $('.osnh-component').each(function(i,e){
-                    if($(e).is(':checked')) OSNH.config.components.push($(e).attr('id'));    
+                    var id = $(e).attr('id');
+                    if($(e).is(':checked')) arr[id] = true;
                 });
+                
+                OSNH.config.components = [];
+                for(var cmp in arr){
+                    OSNH.config.components.push(cmp);
+                }
             });
             
             $('#osnh-channel-select').change(function(){
