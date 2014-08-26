@@ -185,15 +185,20 @@ OSNH.ajaxError = function(e,t,n){
 
 OSNH.ajax = function(conf){
     
-    $.ajax({
-        type :conf.method,
-        url: ((conf.resource.indexOf(OSNH.apiBase) == -1) ? OSNH.apiBase : '') +conf.resource,
-        success:conf.callback,
+    // OSNH.log('OSNH ajax call to: ' + conf.resource);
+    
+    if(typeof(conf) != 'undefined'){
+        $.ajax({
+            type :conf.method,
+            url: ((conf.resource.indexOf(OSNH.apiBase) == -1) ? OSNH.apiBase : '') +conf.resource,
+            success:conf.callback,
         
-        contentType:OSNH.contentType,
-        beforeSend:OSNH.beforeSend,
-        error:OSNH.ajaxError
-    });
+            contentType:OSNH.contentType,
+            beforeSend:OSNH.beforeSend,
+            error:OSNH.ajaxError
+        });
+    }
+    else conf.callback({});
 };
 
 OSNH.getConversationId = function(){

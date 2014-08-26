@@ -228,6 +228,19 @@ var TRAY = {
         
         return url.substring(en+1);
     },
+   
+    truncString: function(str,len){
+        
+        var lstr = '';
+        
+        if(str){
+            lstr = str.substring(0,70);
+            if(lstr.length > 70){
+                lstr += '&hellip;';
+            }
+        }
+        return lstr;            
+    },
     
     postProcessUnreadDisplay: function(){
     
@@ -238,6 +251,12 @@ var TRAY = {
                 if(TRAY.starCache[TRAY.unreadList[m].url]) TRAY.unreadList[m].isStarred = true;
                     
                 if(TRAY.unreadList[m].objectType == 'waggle/conversation-followup'){
+                    
+                    if(typeof(TRAY.unreadList[m].messageURL) === 'undefined'){
+                        window.OSNH.log('No messageURL in followup');
+                        window.OSNH.log(JSON.stringify(TRAY.unreadList[m]));
+                    }
+                    
                     window.OSNH.ajax({
                         method:'GET',
                         resource:TRAY.unreadList[m].messageURL,
@@ -246,10 +265,7 @@ var TRAY = {
                             
                             if(TRAY.starCache[it.url]) TRAY.unreadList[m].isStarred = true;
                             
-                            TRAY.unreadList[m].name = it.createdByUserDisplayName+' - '+obj.plainText.substring(0,70) ;
-                            if(obj.plainText.length > 70){
-                                TRAY.unreadList[m].name += '&hellip;';
-                            }
+                            TRAY.unreadList[m].name = TRAY.truncString(it.createdByUserDisplayName+' - '+obj.plainText,70);
                             TRAY.unreadList[m].modifiedDate = obj.modifiedDate;
                             
                             if(it.followupType == 'FOR_YOUR_INFORMATION') {
@@ -265,39 +281,58 @@ var TRAY = {
                                 TRAY.unreadList[m].itemHint = 'Flag - Urgent, Please Reply!';
                             }
                             
-                            window.OSNH.ajax({
-                                method:'GET',
-                                resource:obj.conversationURL,
-                                callback:function(cnv){
-                                
-                                    if(TRAY.starCache[cnv.url]) TRAY.unreadList[m].isStarred = true;
-                            
-                                    if(cnv.objectType == 'waggle/wall'){
+                            if(obj.collectionURL){
+                                TRAY.unreadList[m].hashValue = 'ExtensionPlace:id='+TRAY.idFromEnd(obj.collectionURL)+'&m=MESSAGES';
+                                // TRAY.unreadList[m].itemType = 'collec';
+                                // TRAY.unreadList[m].itemHint = 'Collection Wall';
+                                TRAY.unreadList[m].postProcessed = true;
+                                TRAY.postProcessUnreadDisplay();
+                            } 
+                            else {
+                                if(typeof(obj.conversationURL) === 'undefined'){
+                                    window.OSNH.log('No conversationURL, and I really need one, guessing at something.');
+                                    window.OSNH.log(JSON.stringify(obj));
                                     
-                                        TRAY.getWallLinkFromConvo(m,cnv.membersURL,TRAY.idFromEnd(it.messageURL),0);
-                                    }
-                                    else if(cnv.objectType == 'waggle/wall-group'){
+                                    TRAY.unreadList[m].postProcessed = true;
+                                    TRAY.unreadList[m].hashValue = 'conversation:id='+obj.id;
+                                    TRAY.postProcessUnreadDisplay();
+                                }
+                                else {
+                                    window.OSNH.ajax({
+                                        method:'GET',
+                                        resource:obj.conversationURL,
+                                        callback:function(cnv){
                                         
-                                        window.OSNH.ajax({
-                                            method:'GET',
-                                            resource:cnv.membersURL+'?offset=0&count=1',
-                                            callback:function(grp){
-                                                if(TRAY.starCache[grp.url]) TRAY.unreadList[m].isStarred = true;
-                            
+                                            if(TRAY.starCache[cnv.url]) TRAY.unreadList[m].isStarred = true;
+                                    
+                                            if(cnv.objectType == 'waggle/wall'){
+                                            
+                                                TRAY.getWallLinkFromConvo(m,cnv.membersURL,TRAY.idFromEnd(it.messageURL),0);
+                                            }
+                                            else if(cnv.objectType == 'waggle/wall-group'){
+                                                
+                                                window.OSNH.ajax({
+                                                    method:'GET',
+                                                    resource:cnv.membersURL+'?offset=0&count=1',
+                                                    callback:function(grp){
+                                                        if(TRAY.starCache[grp.url]) TRAY.unreadList[m].isStarred = true;
+                                    
+                                                        TRAY.unreadList[m].postProcessed = true;
+                                                        TRAY.unreadList[m].hashValue = 'group:groupId='+grp.items[0].id+'&messageId='+TRAY.idFromEnd(it.messageURL)+'&m=WALL';
+                                                        TRAY.postProcessUnreadDisplay();
+                                                    }
+                                                });
+                                            }
+                                            else{
+                                                
                                                 TRAY.unreadList[m].postProcessed = true;
-                                                TRAY.unreadList[m].hashValue = 'group:groupId='+grp.items[0].id+'&messageId='+TRAY.idFromEnd(it.messageURL)+'&m=WALL';
+                                                TRAY.unreadList[m].hashValue = 'conversation:id='+TRAY.idFromEnd(it.conversationURL)+'&sid='+TRAY.idFromEnd(it.messageURL)+'&m=MESSAGES';
                                                 TRAY.postProcessUnreadDisplay();
                                             }
-                                        });
-                                    }
-                                    else{
-                                        
-                                        TRAY.unreadList[m].postProcessed = true;
-                                        TRAY.unreadList[m].hashValue = 'conversation:id='+TRAY.idFromEnd(it.conversationURL)+'&sid='+TRAY.idFromEnd(it.messageURL)+'&m=MESSAGES';
-                                        TRAY.postProcessUnreadDisplay();
-                                    }
+                                        }
+                                    });
                                 }
-                            });
+                            }
                         }
                     });
                 }   
