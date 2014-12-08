@@ -3,6 +3,7 @@
 // @namespace   com.oracle.osn.hax
 // @description Hacks and modifications to enhance your Oracle Social Network user experience
 // @include     https://osn-fusioncrm.oracle.com/osn/web/*
+// @include     https://socialnetwork.oracle.com/osn/web/*
 // @version     1.0
 // @grant       none
 // @run-at      document-start
