@@ -424,22 +424,9 @@ if((window.location+'').indexOf('https://socialnetwork.oracle.com/osn/web/?conve
       
     var apiKey = window.Oracle.OSN.randomId; // data.apiRandomID;
     var avatarURL = data.user.scaledPictureURL;
-    var wallURL = 'https://socialnetwork.oracle.com/osn/social/api/v1/conversations/55661155/messages'; // data.user.wallURL+'/messages'; // https://socialnetwork.oracle.com/osn/social/api/v1/conversations/1162983
+    var wallURL = data.user.wallURL+'/messages'; // https://socialnetwork.oracle.com/osn/social/api/v1/conversations/1162983
     var shareTitle = queryDict['shareTitle'];
     var shareLink = queryDict['shareLink'];
-      /*
-                  $.ajax({
-        url:'https://socialnetwork.oracle.com/osn/social/api/v1/conversations/55661155/messages',
-        type:'POST',
-        data:JSON.stringify({message:"hello share again"}),
-        contentType:'application/json',
-        beforeSend:function(e){
-          e.setRequestHeader("X-Waggle-RandomID",window.Oracle.OSN.randomId);
-        },
-        success:function(data){
-          console.log('Posted!');
-        }
-      });*/
       
     $('body').html(
       '<div style="background:url('+avatarURL+') no-repeat 5px 33px;">'+
