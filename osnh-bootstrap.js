@@ -396,3 +396,70 @@ http://www.jquery4u.com/snippets/safe-console-log/
 */
 (function(a){function b(){}for(var c="assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(","),d;!!(d=c.pop());){a[d]=a[d]||b;}})
 (function(){try{console.log();return window.console;}catch(a){return (window.console={});}}());
+
+// *
+// Temporary way to hack in the Share handler
+// *
+
+// Query string parsing, from; http://stackoverflow.com/questions/5448545/how-to-retrieve-get-parameters-from-javascript
+var queryDict = {};
+location.search.substr(1).split("&").forEach(function(item) {queryDict[item.split("=")[0]] = decodeURIComponent(item.split("=")[1])});
+if((window.location+'').indexOf('https://socialnetwork.oracle.com/osn/web/?conversation=7165989&window=standalone&shareLink=') == 0 && queryDict['shareTitle'] && queryDict['shareLink']){
+  
+  console.log('Starting up sharing page');  
+    
+  $.ajax({url:'/osn/social/api/v1/connection',type:'GET',contentType:'application/json',success:function(data){
+      
+    var apiKey = window.Oracle.OSN.randomId; // data.apiRandomID;
+    var avatarURL = data.user.scaledPictureURL;
+    var wallURL = data.user.wallURL+'/messages'; // https://socialnetwork.oracle.com/osn/social/api/v1/conversations/1162983
+    var shareTitle = queryDict['shareTitle'];
+    var shareLink = queryDict['shareLink'];
+      
+    $('body').html(
+      '<div style="background:url('+avatarURL+') no-repeat 5px 33px;">'+
+        '<div style="font-size:12px;height:28px;color:white;background:#0572ce no-repeat 3px 1px url(data:image/png;base64,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);">'+
+        '<div style="padding-top:6px;padding-left:35px;font-weight:bold;">Share to OSN</div>'+
+        '</div>'+
+        '<div style="padding:10px;padding-left:55px;">'+
+        '<textarea id="osnShareText" rows="3" style="font-size:12px;width:100%;" placeholder="Say something about this..."></textarea>'+
+        '<div style="border:1px #c9c9c9 dashed;margin-top:5px;padding:10px;">'+
+          '<div style="color:#0572ce;font-size:14px;">'+shareTitle+'</div>'+
+        '<div style="font-size:10px;margin-top:5px;">'+shareLink+'</div>'+
+          '</div>'+
+        '</div>'+
+        '<div style="font-size:12px;height:32px;padding-top:5px;border-top:1px solid #c9c9c9;background:#eeeff0;width:100%;position:fixed;bottom:0;left:0;text-align:right;">'+
+          '<a style="margin-right:5px;" class="gwt-Anchor osn_button_primary osn_button_textOnly" href="javascript:;" id="osnShareOK">Share</a>'+
+          '<a style="margin-right:5px;" class="gwt-Anchor osn_button_secondary osn_button_textOnly" href="javascript:;" id="osnShareCancel">Cancel</a>'+
+        '</div>'+
+      '</div>'
+    );
+      
+    $('#osnShareOK').click(function(){
+      console.log('Share to OSN');
+        
+      $.ajax({
+        url:wallURL,
+        type:'POST',
+        data:JSON.stringify({message:'<p>'+$('#osnShareText').val()+'</p><p><strong>'+shareTitle+'</strong></p><p><a href="'+shareLink+'">'+shareLink+'</a></p>'}),
+        contentType:'application/json',
+        beforeSend:function(e){
+          e.setRequestHeader("X-Waggle-RandomID",apiKey);
+        },
+        success:function(data){
+          window.close();
+        }
+      });
+      
+      
+    });
+      
+    $('#osnShareCancel').click(function(){
+      window.close();
+    });
+    
+  }});
+    
+  document.title='Share to OSN';
+}
+
