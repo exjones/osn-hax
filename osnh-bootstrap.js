@@ -345,16 +345,17 @@ OSNH.updateSettingsPage = function(){
                 for(var cmp in arr){
                     OSNH.config.components.push(cmp);
                 }
+                OSNH.saveConfig(OSNH.config);
             });
             
             $('#osnh-channel-select').change(function(){
                 OSNH.log('Changed channel:'+$(this).val()); 
                 OSNH.config.channel = $(this).val();
+                OSNH.saveConfig(OSNH.config);
             });
             
             $('#osnh_apply_changes').click(function(evt){
                 OSNH.log('Saving config: ' + JSON.stringify(OSNH.config));
-                OSNH.saveConfig(OSNH.config);
                 setTimeout(function(){OSNH.log('Reloading location: '+window.location);window.location.reload();},1000);
                 evt.preventDefault();
             });
