@@ -375,21 +375,15 @@ var queryDict = {};
 location.search.substr(1).split("&").forEach(function(item) {queryDict[item.split("=")[0]] = item.split("=")[1]});
 var locn = window.location+'';
     
-// console.log(locn.indexOf('shareLink'));
-// console.log(locn.indexOf('shareTitle'));
-// console.log(locn.indexOf('ExtensionPlace:id=7165989'));
-// console.log(queryDict['shareTitle']);
-// console.log(queryDict['shareLink']);
-    
 if(locn.indexOf('shareLink') > 0 && locn.indexOf('shareTitle') > 0 && locn.indexOf('ExtensionPlace:id=7165989') > 0 && queryDict['shareTitle'] && queryDict['shareLink']){
     
   $.ajax({url:'/osn/social/api/v1/connection',type:'GET',contentType:'application/json',success:function(data){
   
     console.log('Starting up sharing page');  
       
-    var apiKey = window.Oracle.OSN.randomId; // data.apiRandomID;
+    var apiKey = window.Oracle.OSN.randomId; 
     var avatarURL = data.user.scaledPictureURL;
-    var wallURL = data.user.wallURL+'/messages'; // https://socialnetwork.oracle.com/osn/social/api/v1/conversations/1162983
+    var wallURL = data.user.wallURL+'/messages'; 
     var shareTitle = decodeURIComponent(atob(queryDict['shareTitle']));
     var shareLink = decodeURIComponent(atob(queryDict['shareLink']));
       
@@ -406,6 +400,7 @@ if(locn.indexOf('shareLink') > 0 && locn.indexOf('shareTitle') > 0 && locn.index
           '</div>'+
         '</div>'+
         '<div style="font-size:12px;height:32px;padding-top:5px;border-top:1px solid #c9c9c9;background:#eeeff0;width:100%;position:fixed;bottom:0;left:0;text-align:right;">'+
+          '<span style="margin-right:5px;">Share to</span><select style="margin-right:5px;" id="osnShareConvo"><option value="'+wallURL+'">My Wall</option></select>'+
           '<a style="margin-right:5px;" class="gwt-Anchor osn_button_primary osn_button_textOnly" href="javascript:;" id="osnShareOK">Share</a>'+
           '<a style="margin-right:5px;" class="gwt-Anchor osn_button_secondary osn_button_textOnly" href="javascript:;" id="osnShareCancel">Cancel</a>'+
         '</div>'+
@@ -413,10 +408,12 @@ if(locn.indexOf('shareLink') > 0 && locn.indexOf('shareTitle') > 0 && locn.index
     );
       
     $('#osnShareOK').click(function(){
-      console.log('Share to OSN');
-        
+    
+      var shareUrl = $('#osnShareConvo').val();
+      console.log('Share to OSN: ' + shareUrl);
+      
       $.ajax({
-        url:wallURL,
+        url:shareUrl,
         type:'POST',
         data:JSON.stringify({message:'<p>'+$('#osnShareText').val()+'</p><p><strong>'+shareTitle+'</strong></p><p><a href="'+shareLink+'">'+shareLink+'</a></p>'}),
         contentType:'application/json',
@@ -428,11 +425,29 @@ if(locn.indexOf('shareLink') > 0 && locn.indexOf('shareTitle') > 0 && locn.index
         }
       });
       
-      
     });
       
     $('#osnShareCancel').click(function(){
       window.close();
+    });
+    
+    $.ajax({
+        url:'/osn/social/api/v1/stars?offset=0&count=50',
+        success: function(data){
+            if(data && data.items){
+                for(var i = 0;i < data.items.length;i++){
+                    if(data.items[i].url && data.items[i].url.indexOf('/osn/social/api/v1/conversations/') > 0){
+                        var title = data.items[i].name;
+                        if(title.length > 20){
+                            title = title.substring(0,17)+'...';
+                        }    
+                        $('#osnShareConvo').append(
+                            '<option title="'+data.items[i].name+'" value="'+data.items[i].url+'/messages">'+title+'</option>'
+                        );
+                    }
+                }
+            }
+        }
     });
     
   }});
