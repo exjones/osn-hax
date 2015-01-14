@@ -282,6 +282,20 @@ OSNH.registerHashChangeListener = function(id,callback){
     OSNH.hashListeners[id] = callback;
 };
 
+OSNH.updateActiveComponents = function(){
+
+    var arr = {};
+    $('.osnh-component').each(function(i,e){
+        var id = $(e).attr('id');
+        if($(e).is(':checked')) arr[id] = true;
+    });
+                
+    OSNH.config.components = [];
+    for(var cmp in arr){
+        OSNH.config.components.push(cmp);
+    }    
+};
+
 OSNH.updateSettingsPage = function(){
     
     if(window.location.hash !== null && window.location.hash.indexOf('#settings') != -1){
@@ -335,22 +349,14 @@ OSNH.updateSettingsPage = function(){
             $('.osnh-component').change(function(){
                 OSNH.log('Changed checkbox:'+$(this).attr('id')+'='+$(this).is(':checked')); 
                 
-                var arr = {};
-                $('.osnh-component').each(function(i,e){
-                    var id = $(e).attr('id');
-                    if($(e).is(':checked')) arr[id] = true;
-                });
-                
-                OSNH.config.components = [];
-                for(var cmp in arr){
-                    OSNH.config.components.push(cmp);
-                }
+                OSNH.updateActiveComponents();
                 OSNH.saveConfig(OSNH.config);
             });
             
             $('#osnh-channel-select').change(function(){
                 OSNH.log('Changed channel:'+$(this).val()); 
                 OSNH.config.channel = $(this).val();
+                OSNH.updateActiveComponents();
                 OSNH.saveConfig(OSNH.config);
             });
             
@@ -395,7 +401,7 @@ if(locn.indexOf('shareLink') > 0 && locn.indexOf('shareTitle') > 0 && locn.index
         '</div>'+
         '<div style="padding:10px;padding-left:55px;">'+
         '<textarea id="osnShareText" rows="3" style="font-size:12px;width:100%;" placeholder="Say something about this..."></textarea>'+
-        '<div style="border:1px #c9c9c9 dashed;margin-top:5px;padding:10px;">'+
+        '<div style="border:1px #c9c9c9 dashed;margin-top:5px;padding:10px;overflow:hidden;">'+
           '<div style="color:#0572ce;font-size:14px;">'+shareTitle+'</div>'+
         '<div style="font-size:10px;margin-top:5px;">'+shareLink+'</div>'+
           '</div>'+
@@ -433,9 +439,16 @@ if(locn.indexOf('shareLink') > 0 && locn.indexOf('shareTitle') > 0 && locn.index
     });
     
     $.ajax({
-        url:'/osn/social/api/v1/stars?offset=0&count=50',
+        url:'/osn/social/api/v1/stars?offset=0&count=50&filter={"includeClosed":false,"includeOpen":true}',
         success: function(data){
             if(data && data.items){
+                data.items.sort(function(a,b){
+                    var str_a = a.name.toUpperCase();
+                    var str_b = b.name.toUpperCase();
+                    if(str_a < str_b) return -1;
+                    if(str_a > str_b) return 1;
+                    return 0;
+                });
                 for(var i = 0;i < data.items.length;i++){
                     if(data.items[i].url && data.items[i].url.indexOf('/osn/social/api/v1/conversations/') > 0){
                         var title = data.items[i].name;
