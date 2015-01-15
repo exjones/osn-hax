@@ -439,7 +439,8 @@ if(locn.indexOf('shareLink') > 0 && locn.indexOf('shareTitle') > 0 && locn.index
     });
     
     $.ajax({
-        url:'/osn/social/api/v1/stars?offset=0&count=50&filter={"includeClosed":false,"includeOpen":true}',
+        // url:'/osn/social/api/v1/stars?offset=0&count=50&filter={"includeClosed":false,"includeOpen":true}',
+        url:'/osn/social/api/v1/conversations?offset=0&count=50&filter={"limitToStarred":true,"excludeMuted":true,"excludeClosed":true,"excludeOneOnOne":true}',
         success: function(data){
             if(data && data.items){
                 data.items.sort(function(a,b){
