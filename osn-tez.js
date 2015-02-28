@@ -100,33 +100,35 @@ TEZ = {
             				){
     							/* Create the sizer for the bottom-aligned editor in a Conversation */
             					if(tld.parentNode.style && tld.parentNode.style.position == 'absolute'){
-            						if(tld.parentNode.parentNode.firstChild.getAttribute("class") != 'rte-sizer'){
-            							new TEZ.genericSizer({
-            								el: tld.parentNode.parentNode,
-            								cursor: 'n-resize',
-            								border: 'none;border-top:1px solid #B5B6B5',
-            								addSizer: function(div,el){
-            							    	el.firstChild.style.top = '13px';
-    									    	el.insertBefore(div,el.firstChild);
-    										},
-    										setSize: function(el,sz){
-    											var lsz = (sz == null) ? TEZ.tldDefaultSize : sz;
-    											TEZ.tldDefaultSize = lsz;
-    											el.style.height =  lsz + 'px';
-    											el.nextSibling.style.bottom = lsz + 'px';
-    											el.nextSibling.nextSibling.style.bottom = lsz + 'px';
-    										},
-    										getSize: function(org,delta){
-    											return Math.max(100,org - delta);
-    										},
-    										initSize: function(el){
-    											return parseInt(el.style.height.replace(/px/,""));
-    										}
-            							});
-            						}
-            						else{
-            							this.checkForResizeHidden(tld.parentNode.parentNode);
-            						}
+            					    if($('.gwt-Label.GE0BIW3BI2C').length == 0){ // Quick hack to stop the sizer loading if there's a conference in progress
+                						if(tld.parentNode.parentNode.firstChild.getAttribute("class") != 'rte-sizer'){
+                							new TEZ.genericSizer({
+                								el: tld.parentNode.parentNode,
+                								cursor: 'n-resize',
+                								border: 'none;border-top:1px solid #B5B6B5',
+                								addSizer: function(div,el){
+                							    	el.firstChild.style.top = '13px';
+        									    	el.insertBefore(div,el.firstChild);
+        										},
+        										setSize: function(el,sz){
+        											var lsz = (sz == null) ? TEZ.tldDefaultSize : sz;
+        											TEZ.tldDefaultSize = lsz;
+        											el.style.height =  lsz + 'px';
+        											el.nextSibling.style.bottom = lsz + 'px';
+        											el.nextSibling.nextSibling.style.bottom = lsz + 'px';
+        										},
+        										getSize: function(org,delta){
+        											return Math.max(100,org - delta);
+        										},
+        										initSize: function(el){
+        											return parseInt(el.style.height.replace(/px/,""));
+        										}
+                							});
+                						}
+                						else{
+                							this.checkForResizeHidden(tld.parentNode.parentNode);
+                						}
+            					    }
             						break;
             					}
     							/* Create the sizer for a top-aligned editor on a Wall */
